@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32929.385
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestStGenentics.Shared", "TestStGenentics.Shared\TestStGenentics.Shared.csproj", "{E11E75CD-76B0-4287-B60A-01369ECFC75C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestStGenentics.Shared", "TestStGenentics.Shared\TestStGenentics.Shared.csproj", "{E11E75CD-76B0-4287-B60A-01369ECFC75C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestStGenentics.Api", "TestStGenentics.Api\TestStGenentics.Api.csproj", "{68788232-4A6A-4294-A4B3-02D182EC8B36}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestStGenentics.Api", "TestStGenentics.Api\TestStGenentics.Api.csproj", "{68788232-4A6A-4294-A4B3-02D182EC8B36}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestStGenentics.Web", "TestStGenentics.Web\TestStGenentics.Web.csproj", "{BCC2C996-8324-4F7B-87EC-C990722D73A1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestStGenentics.Web", "TestStGenentics.Web\TestStGenentics.Web.csproj", "{BCC2C996-8324-4F7B-87EC-C990722D73A1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

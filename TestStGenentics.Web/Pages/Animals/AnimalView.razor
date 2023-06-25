@@ -1,0 +1,183 @@
+﻿@page "/Animals"
+
+
+@inject IRepository repository
+
+@if (animals is null)
+{
+    <p>Loading ... wait a moment!!!</p>
+}
+else
+{
+    <div class="card">
+        <div class="card-header">
+            <span>
+                <i class="oi oi-globe"></i> Animals
+                <a class="btn btn-sm btn-primary float-end" href="/countries/create"><i class="oi oi-plus"></i> Adicionar País</a>
+            </span>
+        </div>
+        <div class="card-body">
+            <div class="mb-2" style="display: flex; flex-wrap:wrap; align-items: center;">
+            </div>
+
+
+            <GenericList MyList="animals">
+                <Body>
+                    <RadzenButton ButtonStyle="ButtonStyle.Success" Icon="add_circle_outline" class="mt-2 mb-4" Text="Add New Order" Click="@InsertRow" Disabled=@(animalToInsert != null || animalToUpdate != null) />
+                    <RadzenDataGrid @ref="animalsGrid" AllowAlternatingRows="false" AllowFiltering="true" AllowPaging="true" PageSize="10" AllowSorting="true" EditMode="DataGridEditMode.Single"
+                                Data="@animals" TItem="Animal" RowUpdate="@OnUpdateRow" RowCreate="@OnCreateRow" Sort="@Reset" Page="@Reset" Filter="@Reset" ColumnWidth="200px">
+                        <Columns>
+
+                            <RadzenDataGridColumn TItem="Animal" Property="Name" Title="Name" Width="280px">
+                                <EditTemplate Context="animal">
+                                    <RadzenTextBox @bind-Value="animal.Name" Style="width:100%; display: block" Name="Name" />
+                                    <RadzenRequiredValidator Text="Name is required" Component="Name" Popup="true" />
+                                </EditTemplate>
+                            </RadzenDataGridColumn>
+                            <RadzenDataGridColumn TItem="Animal" Context="animal" Filterable="false" Sortable="false" TextAlign="TextAlign.Right" Width="156px">
+                                <Template Context="animal">
+                                    <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@(args => EditRow(animal))" @onclick:stopPropagation="true">
+                                    </RadzenButton>
+                                    <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" class="my-1 ms-1" Click="@(args => DeleteRow(animal))" @onclick:stopPropagation="true">
+                                    </RadzenButton>
+                                </Template>
+                                <EditTemplate Context="animal">
+                                    <RadzenButton Icon="check" ButtonStyle="ButtonStyle.Success" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@((args) => SaveRow(animal))">
+                                    </RadzenButton>
+                                    <RadzenButton Icon="close" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" class="my-1 ms-1" Click="@((args) => CancelEdit(animal))">
+                                    </RadzenButton>
+                                    <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" class="my-1 ms-1" Click="@(args => DeleteRow(animal))">
+                                    </RadzenButton>
+                                </EditTemplate>
+                            </RadzenDataGridColumn>
+                        </Columns>
+                    </RadzenDataGrid>
+                </Body>
+            </GenericList>
+        </div>
+    </div>
+
+
+
+
+}
+
+@code {
+    //public List<Animal>? Animals { get; set; }
+
+
+    //protected override async Task OnInitializedAsync()
+    //{
+    //    // return base.OnInitializedAsync();
+    //    var responseHttp = await repository.Get<List<Animal>>("/Api/animals");
+    //    Animals = responseHttp.Response;
+    //}
+
+
+    RadzenDataGrid<Animal> animalsGrid;
+    List<Animal> animals;
+    //IEnumerable<Customer> customers;
+    //IEnumerable<Employee> employees;
+
+    Animal animalToInsert;
+    Animal animalToUpdate;
+
+    void Reset()
+    {
+        animalToInsert = null;
+        animalToUpdate = null;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var responseHttp = await repository.Get<List<Animal>>("/Api/animals");
+        animals = responseHttp.Response;
+    }
+
+    async Task EditRow(Animal animal)
+    {
+        animalToUpdate = animal;
+        await animalsGrid.EditRow(animal);
+    }
+
+    void OnUpdateRow(Animal animal)
+    {
+        if (animal == animalToInsert)
+        {
+            animalToInsert = null;
+        }
+
+        animalToUpdate = null;
+
+        //dbContext.Update(order);
+
+        //dbContext.SaveChanges();
+    }
+
+    async Task SaveRow(Animal animal)
+    {
+        await animalsGrid.UpdateRow(animal);
+    }
+
+    void CancelEdit(Animal animal)
+    {
+        if (animal == animalToInsert)
+        {
+            animalToInsert = null;
+        }
+
+        animalToUpdate = null;
+
+        animalsGrid.CancelEditRow(animal);
+
+        //var orderEntry = dbContext.Entry(order);
+        //if (orderEntry.State == EntityState.Modified)
+        //{
+        //    orderEntry.CurrentValues.SetValues(orderEntry.OriginalValues);
+        //    orderEntry.State = EntityState.Unchanged;
+        //}
+    }
+
+    async Task DeleteRow(Animal animal)
+    {
+        if (animal == animalToInsert)
+        {
+            animalToInsert = null;
+        }
+
+        if (animal == animalToUpdate)
+        {
+            animalToUpdate = null;
+        }
+
+        //if (orders.Contains(order))
+        //{
+        //    dbContext.Remove<Order>(order);
+
+        //    dbContext.SaveChanges();
+
+        //    await animalsGrid.Reload();
+        //}
+        //else
+        //{
+        animalsGrid.CancelEditRow(animal);
+        await animalsGrid.Reload();
+        //}
+    }
+
+    async Task InsertRow()
+    {
+        animalToInsert = new Animal();
+        await animalsGrid.InsertRow(animalToInsert);
+    }
+
+    void OnCreateRow(Animal animal)
+    {
+        //dbContext.Add(order);
+
+        //dbContext.SaveChanges();
+
+        animalToInsert = null;
+    }
+
+}

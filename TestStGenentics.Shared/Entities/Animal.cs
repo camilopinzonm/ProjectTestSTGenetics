@@ -12,20 +12,21 @@ namespace TestStGenentics.Shared.Entities
         public string? Name { get; set; }
 
 
-        [MaxLength(100)]
-        public string? Breed { get; set; }
+        public int BreedId { get; set; }
 
         public DateTime BirthDate { get; set; }
 
 
-        [MaxLength(25)]
-        public string? Sex { get; set; }
+
+        public int SexId { get; set; }
 
 
         public decimal Price { get; set; }
 
+        public int StatusRowId { get; set; }
 
-        [MaxLength(25)]
-        public string? Status { get; set; }
+        public Breed? Breed { get; set; }
+        public Sex? Sex { get; set; }
+        public StatusRow? StatusRow  { get; set; }
     }
 }

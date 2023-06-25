@@ -15,5 +15,6 @@ namespace TestStGenentics.Shared.Entities
         [Required]
         [MaxLength(20)]
         public string Name { get; set; } = null!;
+        public ICollection<Animal>? Animal { get; set; }
     }
 }

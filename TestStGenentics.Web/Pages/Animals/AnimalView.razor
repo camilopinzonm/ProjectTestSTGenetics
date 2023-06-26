@@ -25,9 +25,27 @@ else
             <GenericList MyList="animals">
                 <Body>
                     <RadzenButton ButtonStyle="ButtonStyle.Success" Icon="add_circle_outline" class="mt-2 mb-4" Text="Add New Order" Click="@InsertRow" Disabled=@(animalToInsert != null || animalToUpdate != null) />
-                    <RadzenDataGrid @ref="animalsGrid" AllowAlternatingRows="false" AllowPaging="true" PageSize="10" AllowSorting="true" EditMode="DataGridEditMode.Single"
-                                Data="@animals" TItem="AnimalResponse" RowUpdate="@OnUpdateRow" RowCreate="@OnCreateRow" Sort="@Reset" Page="@Reset" Filter="@Reset" ColumnWidth="180px">
+                    <RadzenDataGrid @ref="animalsGrid" AllowAlternatingRows="true" AllowPaging="true" PageSize="10" AllowSorting="true" EditMode="DataGridEditMode.Single"
+                                Data="@animals" TItem="AnimalResponse" RowUpdate="@OnUpdateRow" RowCreate="@OnCreateRow" Sort="@Reset" Page="@Reset" Filter="@Reset" ColumnWidth="180px"
+                                SelectionMode="DataGridSelectionMode.Multiple" @bind-Value=@selectedAnimalResponses class="m-4"
+                                Click="@MySelect">
                         <Columns>
+
+
+                            <RadzenDataGridColumn TItem="AnimalResponse" Width="60px" Sortable="false" Filterable="false">
+                                <HeaderTemplate>
+                                   <RadzenCheckBox onclick="@MySelect" TriState="false" TValue="bool" Value="@(animals.Any(i => selectedAnimalResponses != null && selectedAnimalResponses.Contains(i)))"
+                                    Change="@(args => selectedAnimalResponses = args ? animals.ToList() : null)" />
+                                </HeaderTemplate>
+                                <Template Context="animal">
+                                    <RadzenCheckBox onclick="@MySelect" TriState="false" Value="@(selectedAnimalResponses != null && selectedAnimalResponses.Contains(animal))"
+                                                TValue="bool" Change=@(args => { if(!allowRowSelectOnRowClick) { animalsGrid.SelectRow(animal); }}) />
+                                 </Template>
+                            </RadzenDataGridColumn>
+
+
+
+
                             <RadzenDataGridColumn TItem="AnimalResponse" Property="AnimalId" Title="ID" Width="50px" />
                             <RadzenDataGridColumn TItem="AnimalResponse" Property="Name" Title="Name" Width="120px">
                                 <EditTemplate Context="animal">
@@ -111,6 +129,8 @@ else
     IEnumerable<Sex> sexs;
     IEnumerable<StatusRow> statusrows;
     IEnumerable<Breed> breeds;
+    IList<AnimalResponse> selectedAnimalResponses;
+    bool allowRowSelectOnRowClick = true;
 
     AnimalResponse animalToInsert;
     AnimalResponse animalToUpdate;
@@ -191,7 +211,7 @@ else
 
         if (animals.Contains(animal))
         {
-            
+
             //dbContext.SaveChanges();
             var id = animal.AnimalId;
             await animalsGrid.Reload();
@@ -222,6 +242,17 @@ else
         await animalsGrid.Reload();
         await GetData();
 
+    }
+
+    async Task MySelect()
+    {
+
+        var a = selectedAnimalResponses;
+        foreach (var item in selectedAnimalResponses)
+        {
+            Console.WriteLine(item.Name);
+        }
+        
     }
 
 }

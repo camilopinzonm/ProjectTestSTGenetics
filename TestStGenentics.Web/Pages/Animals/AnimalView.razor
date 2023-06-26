@@ -1,4 +1,5 @@
 ﻿@page "/Animals"
+@using TestStGenentics.Shared.ModelResponse
 
 
 @inject IRepository repository
@@ -24,17 +25,58 @@ else
             <GenericList MyList="animals">
                 <Body>
                     <RadzenButton ButtonStyle="ButtonStyle.Success" Icon="add_circle_outline" class="mt-2 mb-4" Text="Add New Order" Click="@InsertRow" Disabled=@(animalToInsert != null || animalToUpdate != null) />
-                    <RadzenDataGrid @ref="animalsGrid" AllowAlternatingRows="false" AllowFiltering="true" AllowPaging="true" PageSize="10" AllowSorting="true" EditMode="DataGridEditMode.Single"
-                                Data="@animals" TItem="Animal" RowUpdate="@OnUpdateRow" RowCreate="@OnCreateRow" Sort="@Reset" Page="@Reset" Filter="@Reset" ColumnWidth="200px">
+                    <RadzenDataGrid @ref="animalsGrid" AllowAlternatingRows="false" AllowPaging="true" PageSize="10" AllowSorting="true" EditMode="DataGridEditMode.Single"
+                                Data="@animals" TItem="AnimalResponse" RowUpdate="@OnUpdateRow" RowCreate="@OnCreateRow" Sort="@Reset" Page="@Reset" Filter="@Reset" ColumnWidth="180px">
                         <Columns>
-
-                            <RadzenDataGridColumn TItem="Animal" Property="Name" Title="Name" Width="280px">
+                            <RadzenDataGridColumn TItem="AnimalResponse" Property="AnimalId" Title="ID" Width="50px" />
+                            <RadzenDataGridColumn TItem="AnimalResponse" Property="Name" Title="Name" Width="120px">
                                 <EditTemplate Context="animal">
                                     <RadzenTextBox @bind-Value="animal.Name" Style="width:100%; display: block" Name="Name" />
                                     <RadzenRequiredValidator Text="Name is required" Component="Name" Popup="true" />
                                 </EditTemplate>
                             </RadzenDataGridColumn>
-                            <RadzenDataGridColumn TItem="Animal" Context="animal" Filterable="false" Sortable="false" TextAlign="TextAlign.Right" Width="156px">
+                            
+                            <RadzenDataGridColumn TItem="AnimalResponse" Property="BreedName" Title="Breed" Width="140px" >
+                                <EditTemplate Context="animal">
+                                    <RadzenDropDown @bind-Value="animal.BreedId" Data="@breeds" TextProperty="Name" ValueProperty="Id" Style="width:100%; display: block;" />
+                                </EditTemplate>
+                            </RadzenDataGridColumn>
+
+                            <RadzenDataGridColumn TItem="AnimalResponse" Property="BirthDate" Title="Birth Date" Width="120px">
+                                <Template Context="animal">
+                                    @String.Format("{0:d}", animal.BirthDate)
+                                </Template>
+                                <EditTemplate Context="animal">
+                                    <RadzenDatePicker @bind-Value="animal.BirthDate" Style="width:100%" />
+                                </EditTemplate>
+                            </RadzenDataGridColumn>
+
+                            <RadzenDataGridColumn TItem="AnimalResponse" Property="SexName" Title="SexId" Width="120px" >
+                                <EditTemplate Context="animal">
+                                    <RadzenDropDown @bind-Value="animal.SexId" Data="@sexs" TextProperty="Name" ValueProperty="Id" Style="width:100%; display: block;" />
+                                </EditTemplate>
+                            </RadzenDataGridColumn>
+
+
+                            <RadzenDataGridColumn TItem="AnimalResponse" Property="Price" Title="Price" Width="120px">
+                                <Template Context="animal">
+                                    @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", animal.Price)
+                                </Template>
+                                <EditTemplate Context="animal">
+                                    <RadzenNumeric @bind-Value=" animal.Price" Style="width:150%" />
+                                </EditTemplate>
+                                <FooterTemplate>
+                                    Total quantity: <b>@String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", animals.Sum(o => o.Price))</b>
+                                </FooterTemplate>
+                            </RadzenDataGridColumn>
+
+                            <RadzenDataGridColumn TItem="AnimalResponse" Property="StatusRowName" Title="Status" Width="80px" >
+                                <EditTemplate Context="animal">
+                                    <RadzenDropDown @bind-Value="animal.StatusRowId" Data="@statusrows" TextProperty="Name" ValueProperty="Id" Style="width:100%; display: block;" />
+                                </EditTemplate>
+                             </RadzenDataGridColumn>
+
+                            <RadzenDataGridColumn TItem="AnimalResponse" Context="animal" Filterable="false" Sortable="false" TextAlign="TextAlign.Right" Width="100px">
                                 <Template Context="animal">
                                     <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@(args => EditRow(animal))" @onclick:stopPropagation="true">
                                     </RadzenButton>
@@ -63,24 +105,15 @@ else
 }
 
 @code {
-    //public List<Animal>? Animals { get; set; }
 
+    RadzenDataGrid<AnimalResponse>? animalsGrid;
+    List<AnimalResponse> animals;
+    IEnumerable<Sex> sexs;
+    IEnumerable<StatusRow> statusrows;
+    IEnumerable<Breed> breeds;
 
-    //protected override async Task OnInitializedAsync()
-    //{
-    //    // return base.OnInitializedAsync();
-    //    var responseHttp = await repository.Get<List<Animal>>("/Api/animals");
-    //    Animals = responseHttp.Response;
-    //}
-
-
-    RadzenDataGrid<Animal> animalsGrid;
-    List<Animal> animals;
-    //IEnumerable<Customer> customers;
-    //IEnumerable<Employee> employees;
-
-    Animal animalToInsert;
-    Animal animalToUpdate;
+    AnimalResponse animalToInsert;
+    AnimalResponse animalToUpdate;
 
     void Reset()
     {
@@ -90,17 +123,27 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        var responseHttp = await repository.Get<List<Animal>>("/Api/animals");
+        var responseHttpsexs = await repository.Get<List<Sex>>("/Api/sexs");
+        sexs = responseHttpsexs.Response;
+        var responseHttpstatusrows = await repository.Get<List<StatusRow>>("/Api/statusrows");
+        statusrows = responseHttpstatusrows.Response;
+        var responseHttpbreeds = await repository.Get<List<Breed>>("/Api/breeds");
+        breeds = responseHttpbreeds.Response;
+        await GetData();
+    }
+
+    async Task GetData() { 
+        var responseHttp = await repository.Get<List<AnimalResponse>>("/Api/animals");
         animals = responseHttp.Response;
     }
 
-    async Task EditRow(Animal animal)
+    async Task EditRow(AnimalResponse animal)
     {
         animalToUpdate = animal;
         await animalsGrid.EditRow(animal);
     }
 
-    void OnUpdateRow(Animal animal)
+    async void OnUpdateRow(AnimalResponse animal)
     {
         if (animal == animalToInsert)
         {
@@ -109,17 +152,18 @@ else
 
         animalToUpdate = null;
 
-        //dbContext.Update(order);
+        await repository.Put("/Api/animals",animal);
+        await animalsGrid.Reload();
+        await GetData();
 
-        //dbContext.SaveChanges();
     }
 
-    async Task SaveRow(Animal animal)
+    async Task SaveRow(AnimalResponse animal)
     {
         await animalsGrid.UpdateRow(animal);
     }
 
-    void CancelEdit(Animal animal)
+    void CancelEdit(AnimalResponse animal)
     {
         if (animal == animalToInsert)
         {
@@ -130,16 +174,11 @@ else
 
         animalsGrid.CancelEditRow(animal);
 
-        //var orderEntry = dbContext.Entry(order);
-        //if (orderEntry.State == EntityState.Modified)
-        //{
-        //    orderEntry.CurrentValues.SetValues(orderEntry.OriginalValues);
-        //    orderEntry.State = EntityState.Unchanged;
-        //}
     }
 
-    async Task DeleteRow(Animal animal)
+    async Task DeleteRow(AnimalResponse animal)
     {
+
         if (animal == animalToInsert)
         {
             animalToInsert = null;
@@ -150,34 +189,39 @@ else
             animalToUpdate = null;
         }
 
-        //if (orders.Contains(order))
-        //{
-        //    dbContext.Remove<Order>(order);
+        if (animals.Contains(animal))
+        {
+            
+            //dbContext.SaveChanges();
+            var id = animal.AnimalId;
+            await animalsGrid.Reload();
+            await repository.Delete($"/Api/animals/{id}");
+            await animalsGrid.Reload();
+            await GetData();
+        }
 
-        //    dbContext.SaveChanges();
-
-        //    await animalsGrid.Reload();
-        //}
-        //else
-        //{
-        animalsGrid.CancelEditRow(animal);
-        await animalsGrid.Reload();
-        //}
+        else
+        {
+            animalsGrid.CancelEditRow(animal);
+            await animalsGrid.Reload();
+        }
     }
 
     async Task InsertRow()
     {
-        animalToInsert = new Animal();
+        animalToInsert = new AnimalResponse();
         await animalsGrid.InsertRow(animalToInsert);
     }
 
-    void OnCreateRow(Animal animal)
+    async void OnCreateRow(AnimalResponse animal)
     {
-        //dbContext.Add(order);
-
-        //dbContext.SaveChanges();
-
+        var a = animal;
         animalToInsert = null;
+        await animalsGrid.Reload();
+        await repository.Post("/Api/animals", animal);
+        await animalsGrid.Reload();
+        await GetData();
+
     }
 
 }

@@ -288,16 +288,16 @@ else
     async Task GetData()
     {
        
-        //selectedAnimalResponses = null;
+        selectedAnimalResponses = null;
         var responseHttp = await repository.Get<List<AnimalResponse>>("/Api/animals");
         animals = responseHttp.Response;
     }
 
     async Task FilterData()
     { 
+        selectedAnimalResponses = null;
         var responseHttpResponseFilter  = await repository.PostGetRows<AnimalResponse, List<AnimalResponse>>("/Api/animals/PostGetAll", animalResponse);
         animals = responseHttpResponseFilter.Response;
-
     }
 
     async Task ClearFilter()

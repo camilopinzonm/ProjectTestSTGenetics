@@ -1,8 +1,16 @@
 ﻿@page "/Animals"
+
 @using TestStGenentics.Shared.ModelResponse
+@using TestStGenentics.Web.Utils
+
 
 
 @inject IRepository repository
+
+
+
+
+
 
 
 <div Class="rz-p-0 rz-p-md-12">
@@ -52,18 +60,63 @@
 
                 
                 <RadzenButton Text="Filter" ButtonType="ButtonType.Button" Click="(() => FilterData())" ButtonStyle="ButtonStyle.Primary" />
-                <RadzenButton Text="All" ButtonType="ButtonType.Button" Click="(() => FilterData())" ButtonStyle="ButtonStyle.Primary" />
-                <RadzenButton Text="Clear" ButtonType="ButtonType.Button" Click="(() => FilterData())" ButtonStyle="ButtonStyle.Primary" />
+                <RadzenButton Text="Clear" ButtonType="ButtonType.Button" Click="(() => ClearFilter())" ButtonStyle="ButtonStyle.Primary" />
                 
                 </RadzenRow>
             </RadzenTemplateForm>
-            <RadzenButton Text="Datagrid Selected" ButtonType="ButtonType.Button" Click="(() => OtraFn())" ButtonStyle="ButtonStyle.Primary" />
+        
 
     </div>
 </div>
 
 
 
+@if (dataselected)
+{
+<div Class="rz-p-0 rz-p-md-12">
+    <div class="card">
+        <div class="card-header">
+            <span>
+                <i class="oi oi-list"></i> Purchases
+            </span>
+        </div>
+        <div class="card-body">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Categoría</th>
+                        <th style="width:200px">Quantity</th>
+                        <th style="width:200px">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in purchases.OrderBy(x=>x.Breeds))
+                    {
+                        <tr>
+                            <td>
+                                @item.Breeds
+                            </td>
+                            <td>
+                                @item.CountRows
+                            </td>
+                            <td>
+                                @item.SumRows
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <div>
+                <p>Total Quantity: @TotalQuantity </p>
+                    <p>Total Amount: @TotalAmount</p>
+                <p>Total Dto: @TotalDto </p>
+                    <p>Total Freight: @Freight</p>
+                    <p>Total Price: @TotalPrice</p>
+            </div>
+        </div>
+    </div>
+  </div>
+}
 
 
 
@@ -91,6 +144,7 @@ else
             <GenericList MyList="animals">
                 <Body>
                     <RadzenButton ButtonStyle="ButtonStyle.Success" Icon="add_circle_outline" class="mt-2 mb-4" Text="Add New Order" Click="@InsertRow" Disabled=@(animalToInsert != null || animalToUpdate != null) />
+                    <RadzenButton Text="Calculate purchase" ButtonType="ButtonType.Button" Click="(() => Calculate())" ButtonStyle="ButtonStyle.Primary" />
                     <RadzenDataGrid @ref="animalsGrid" AllowAlternatingRows="true" AllowPaging="true" PageSize="10" AllowSorting="true" EditMode="DataGridEditMode.Single"
                                 Data="@animals" TItem="AnimalResponse" RowUpdate="@OnUpdateRow" RowCreate="@OnCreateRow" Sort="@Reset" Page="@Reset" Filter="@Reset" ColumnWidth="180px"
                                 SelectionMode="DataGridSelectionMode.Multiple" @bind-Value=@selectedAnimalResponses class="m-4">
@@ -99,11 +153,11 @@ else
 
                             <RadzenDataGridColumn TItem="AnimalResponse" Width="60px" Sortable="false" Filterable="false">
                                 <HeaderTemplate>
-                                   <RadzenCheckBox onclick="@MySelect" TriState="false" TValue="bool" Value="@(animals.Any(i => selectedAnimalResponses != null && selectedAnimalResponses.Contains(i)))"
-                                    Change="@(args => selectedAnimalResponses = args ? animals.ToList() : null)" />
+                                    <RadzenCheckBox onclick="@SelectRows" TriState="false" TValue="bool" Value="@(animals.Any(i => selectedAnimalResponses != null && selectedAnimalResponses.Contains(i)))"
+                                    Change="@(args => selectedAnimalResponses = args ? animals.ToList() : null)" /> ojo
                                 </HeaderTemplate>
                                 <Template Context="animal">
-                                    <RadzenCheckBox onclick="@MySelect" TriState="false" Value="@(selectedAnimalResponses != null && selectedAnimalResponses.Contains(animal))"
+                                    <RadzenCheckBox onclick="@SelectRows" TriState="false" Value="@(selectedAnimalResponses != null && selectedAnimalResponses.Contains(animal))"
                                                 TValue="bool" Change=@(args => { if(!allowRowSelectOnRowClick) { animalsGrid.SelectRow(animal); }}) />
                                  </Template>
                             </RadzenDataGridColumn>
@@ -182,29 +236,33 @@ else
         </div>
     </div>
 
-
-
-
 }
 
+
 @code {
-    string value = "";
 
     AnimalResponse animal;
     AnimalResponse animalResponse = new AnimalResponse();
-
+    List<AnimalResponse> animals;
+    RadzenDataGrid<AnimalResponse>? animalsGrid;
     IList<AnimalResponse> selectedAnimalResponses = new List<AnimalResponse>();
 
-    List<AnimalResponse> selectedAnimalResponsesOtro;
+    RadzenDataGrid<Purchase>? purchaseGrid;
+    Purchase purchase;
+    List<Purchase> purchases = new List<Purchase>();
 
-    RadzenDataGrid<AnimalResponse>? animalsGrid;
-    List<AnimalResponse> animals;
     IEnumerable<Sex> sexs;
     IEnumerable<StatusRow> statusrows;
     IEnumerable<Breed> breeds;
 
-
+    bool dataselected = false;
     bool allowRowSelectOnRowClick = true;
+    int TotalQuantity;
+    decimal TotalDto;
+    decimal TotalAmount=0;
+    decimal TotalPrice;
+    decimal Freight;
+
 
     AnimalResponse animalToInsert;
     AnimalResponse animalToUpdate;
@@ -214,7 +272,7 @@ else
         animalToInsert = null;
         animalToUpdate = null;
     }
- 
+
 
 
     protected override async Task OnInitializedAsync()
@@ -226,21 +284,29 @@ else
         var responseHttpbreeds = await repository.Get<List<Breed>>("/Api/breeds");
         breeds = responseHttpbreeds.Response;
         await GetData();
+        selectedAnimalResponses = null;
     }
-    
+
     async Task GetData()
     {
+        bool dataselected = false;
         var responseHttp = await repository.Get<List<AnimalResponse>>("/Api/animals");
         animals = responseHttp.Response;
     }
 
     async Task FilterData()
     { 
-       var responseHttpResponseFilter  = await repository.PostGetRows<AnimalResponse, List<AnimalResponse>>("/Api/animals/PostGetAll", animalResponse);
-       animals = responseHttpResponseFilter.Response;
-       
+        var responseHttpResponseFilter  = await repository.PostGetRows<AnimalResponse, List<AnimalResponse>>("/Api/animals/PostGetAll", animalResponse);
+        animals = responseHttpResponseFilter.Response;
+
     }
 
+    async Task ClearFilter()
+    { 
+        animalResponse = null;
+        await GetData();
+
+    }
     async Task EditRow(AnimalResponse animal)
     {
         animalToUpdate = animal;
@@ -296,7 +362,6 @@ else
         if (animals.Contains(animal))
         {
 
-            //dbContext.SaveChanges();
             var id = animal.AnimalId;
             await animalsGrid.Reload();
             await repository.Delete($"/Api/animals/{id}");
@@ -328,27 +393,35 @@ else
 
     }
 
-    async Task OtraFn() { 
+    async Task Calculate() {
 
-        foreach (var item in selectedAnimalResponses)
-        {
 
-            Console.WriteLine(item.Name,"Otra Fn");
-        }
+        dataselected = true;
+
+        var data = await CalculatePurchase.GetDataCalculate(selectedAnimalResponses);
+        purchases = data.ListRows;
+        TotalQuantity = data.Quantity;
+        TotalAmount = data.TotalAmount;
+        TotalDto = data.TotalDto;
+        Freight = data.Freight;
+        TotalPrice= TotalAmount - TotalDto + Freight;
+    
+
     }
 
-    async Task MySelect()
+    async Task CalculateDto() {
+
+    }
+
+    async Task SelectRows()
     {
 
-        var a = selectedAnimalResponses;
-        Console.WriteLine(a);
-        //selectedAnimalResponsesss.AddRange(selectedAnimalResponses);
-        foreach (var item in a)
-        {
-            
-            Console.WriteLine(item.Name);
-        }
-        
+        //if (selectedAnimalResponses == null || selectedAnimalResponses.Count() == 0)
+        //{
+        //    dataselected = false;
+        //}
+       
+
     }
 
 }

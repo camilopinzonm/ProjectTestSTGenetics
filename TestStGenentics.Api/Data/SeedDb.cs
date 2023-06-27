@@ -66,26 +66,26 @@ namespace TestStGenentics.Api.Data
         {
             if (!_context.Animals.Any())
             {
-                _context.Animals.Add(new Animal { Name = "Ramon", BreedId = 1, BirthDate = Convert.ToDateTime("01/01/1983"), SexId=1, Price = 0, StatusRowId = 2 });
-                _context.Animals.Add(new Animal { Name = "Jose", BreedId = 2, BirthDate = Convert.ToDateTime("01/01/1983"), SexId = 1, Price = 0, StatusRowId = 2 });
-                _context.Animals.Add(new Animal { Name = "Clarita", BreedId = 3, BirthDate = Convert.ToDateTime("01/01/1983"), SexId = 2, Price = 0, StatusRowId = 2 });
-                _context.Animals.Add(new Animal { Name = "Morro", BreedId = 4, BirthDate = Convert.ToDateTime("01/01/1983"), SexId = 1, Price = 0, StatusRowId = 2 });
-                _context.Animals.Add(new Animal { Name = "Santo", BreedId = 4, BirthDate = Convert.ToDateTime("01/01/1983"), SexId = 1, Price = 0, StatusRowId = 2 });
-                _context.Animals.Add(new Animal { Name = "Pleta", BreedId = 6, BirthDate = Convert.ToDateTime("01/01/1983"), SexId = 2, Price = 0, StatusRowId = 2 });
-                _context.Animals.Add(new Animal { Name = "Sin Nombre1", BreedId = 5, BirthDate = Convert.ToDateTime("01/01/1983"), SexId = 1, Price = 0, StatusRowId = 2 });
-                _context.Animals.Add(new Animal { Name = "Sin Nombre2", BreedId = 8, BirthDate = Convert.ToDateTime("01/01/1983"), SexId = 1, Price = 0, StatusRowId = 2 });
-                _context.Animals.Add(new Animal { Name = "Sin Nombre3", BreedId = 1, BirthDate = Convert.ToDateTime("01/01/1983"), SexId = 1, Price = 0, StatusRowId = 2 });
-                _context.Animals.Add(new Animal { Name = "Sin Nombre41", BreedId = 1, BirthDate = Convert.ToDateTime("01/01/1983"), SexId = 2, Price = 0, StatusRowId = 2 });
-                _context.Animals.Add(new Animal { Name = "Sin Nombre5", BreedId = 9, BirthDate = Convert.ToDateTime("01/01/1983"), SexId = 1, Price = 0, StatusRowId = 2 });
-                _context.Animals.Add(new Animal { Name = "Sin Nombre55", BreedId = 4, BirthDate = Convert.ToDateTime("01/01/1983"), SexId = 2, Price = 0, StatusRowId = 2 });
-                _context.Animals.Add(new Animal { Name = "Sin Nombre6", BreedId = 3, BirthDate = Convert.ToDateTime("01/01/1983"), SexId = 1, Price = 0, StatusRowId = 2 });
-                _context.Animals.Add(new Animal { Name = "Sin Nombre7", BreedId = 6, BirthDate = Convert.ToDateTime("01/01/1983"), SexId = 1, Price = 0, StatusRowId = 2 });
-                _context.Animals.Add(new Animal { Name = "Sin Nombre8", BreedId = 7, BirthDate = Convert.ToDateTime("01/01/1983"), SexId = 2, Price = 0, StatusRowId = 2 });
-                _context.Animals.Add(new Animal { Name = "Sin Nombre9", BreedId = 1, BirthDate = Convert.ToDateTime("01/01/1983"), SexId = 2, Price = 0, StatusRowId = 2 });
-                _context.Animals.Add(new Animal { Name = "Sin Nombre77", BreedId = 1, BirthDate = Convert.ToDateTime("01/01/1983"), SexId = 2, Price = 0, StatusRowId = 2 });
-                _context.Animals.Add(new Animal { Name = "Sin Nombre11", BreedId = 1, BirthDate = Convert.ToDateTime("01/01/1983"), SexId = 2, Price = 0, StatusRowId = 2 });
-                _context.Animals.Add(new Animal { Name = "Sin Nombre34", BreedId = 2, BirthDate = Convert.ToDateTime("01/01/1983"), SexId = 2, Price = 0, StatusRowId = 2 });
-                _context.Animals.Add(new Animal { Name = "Sin Nombre14", BreedId = 10, BirthDate = Convert.ToDateTime("01/01/1983"), SexId = 1, Price = 0, StatusRowId = 2 });
+                _context.Animals.Add(new Animal { Name = "Ramon", BreedId = 1, BirthDate = Convert.ToDateTime("01/01/1983"), SexId=1, Price = 10, StatusRowId = 2 });
+                _context.Animals.Add(new Animal { Name = "Jose", BreedId = 2, BirthDate = Convert.ToDateTime("01/01/1983"), SexId = 1, Price = 10, StatusRowId = 2 });
+                _context.Animals.Add(new Animal { Name = "Clarita", BreedId = 3, BirthDate = Convert.ToDateTime("01/01/1983"), SexId = 2, Price = 10, StatusRowId = 2 });
+                _context.Animals.Add(new Animal { Name = "Morro", BreedId = 4, BirthDate = Convert.ToDateTime("01/01/1983"), SexId = 1, Price = 10, StatusRowId = 2 });
+                _context.Animals.Add(new Animal { Name = "Santo", BreedId = 4, BirthDate = Convert.ToDateTime("01/01/1983"), SexId = 1, Price = 10, StatusRowId = 2 });
+                _context.Animals.Add(new Animal { Name = "Pleta", BreedId = 6, BirthDate = Convert.ToDateTime("01/01/1983"), SexId = 2, Price = 10, StatusRowId = 2 });
+                _context.Animals.Add(new Animal { Name = "Sin Nombre1", BreedId = 5, BirthDate = Convert.ToDateTime("01/01/1983"), SexId = 1, Price = 10, StatusRowId = 2 });
+                _context.Animals.Add(new Animal { Name = "Sin Nombre2", BreedId = 8, BirthDate = Convert.ToDateTime("01/01/1983"), SexId = 1, Price = 10, StatusRowId = 2 });
+                _context.Animals.Add(new Animal { Name = "Sin Nombre3", BreedId = 1, BirthDate = Convert.ToDateTime("01/01/1983"), SexId = 1, Price = 10, StatusRowId = 2 });
+                _context.Animals.Add(new Animal { Name = "Sin Nombre41", BreedId = 1, BirthDate = Convert.ToDateTime("01/01/1983"), SexId = 2, Price = 10, StatusRowId = 2 });
+                _context.Animals.Add(new Animal { Name = "Sin Nombre5", BreedId = 9, BirthDate = Convert.ToDateTime("01/01/1983"), SexId = 1, Price = 10, StatusRowId = 2 });
+                _context.Animals.Add(new Animal { Name = "Sin Nombre55", BreedId = 4, BirthDate = Convert.ToDateTime("01/01/1983"), SexId = 2, Price = 10, StatusRowId = 2 });
+                _context.Animals.Add(new Animal { Name = "Sin Nombre6", BreedId = 3, BirthDate = Convert.ToDateTime("01/01/1983"), SexId = 1, Price = 10, StatusRowId = 2 });
+                _context.Animals.Add(new Animal { Name = "Sin Nombre7", BreedId = 6, BirthDate = Convert.ToDateTime("01/01/1983"), SexId = 1, Price = 10, StatusRowId = 2 });
+                _context.Animals.Add(new Animal { Name = "Sin Nombre8", BreedId = 7, BirthDate = Convert.ToDateTime("01/01/1983"), SexId = 2, Price = 10, StatusRowId = 2 });
+                _context.Animals.Add(new Animal { Name = "Sin Nombre9", BreedId = 1, BirthDate = Convert.ToDateTime("01/01/1983"), SexId = 2, Price = 10, StatusRowId = 2 });
+                _context.Animals.Add(new Animal { Name = "Sin Nombre77", BreedId = 1, BirthDate = Convert.ToDateTime("01/01/1983"), SexId = 2, Price = 10, StatusRowId = 2 });
+                _context.Animals.Add(new Animal { Name = "Sin Nombre11", BreedId = 1, BirthDate = Convert.ToDateTime("01/01/1983"), SexId = 2, Price = 10, StatusRowId = 2 });
+                _context.Animals.Add(new Animal { Name = "Sin Nombre34", BreedId = 2, BirthDate = Convert.ToDateTime("01/01/1983"), SexId = 2, Price = 10, StatusRowId = 2 });
+                _context.Animals.Add(new Animal { Name = "Sin Nombre14", BreedId = 10, BirthDate = Convert.ToDateTime("01/01/1983"), SexId = 1, Price = 10, StatusRowId = 2 });
 
                 await _context.SaveChangesAsync();
             }

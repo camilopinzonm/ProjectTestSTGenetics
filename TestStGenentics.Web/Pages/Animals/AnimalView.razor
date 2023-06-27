@@ -4,17 +4,83 @@
 
 @inject IRepository repository
 
+
+<div Class="rz-p-0 rz-p-md-12">
+    <div class="card">
+         <div class="card-header">
+             <span>
+                <i class="oi oi-globe"></i> Filter
+                
+            </span>
+             </div>
+             <RadzenTemplateForm TItem="AnimalResponse" Data="@animalResponse" Submit="FilterData">
+                <RadzenRow AlignItems="AlignItems.End" Wrap="FlexWrap.Wrap" Gap="1rem" Class="rz-p-sm-12">
+                
+                    <RadzenColumn Size="12" SizeMD="6" SizeLG="3">
+                   <RadzenFormField Text="Name" Style="width: 100%;">
+                        <RadzenTextBox type="text" class="form-control" MaxLength="16" @bind-Value="@animalResponse.Name" />
+                    </RadzenFormField>
+                </RadzenColumn>
+
+                <RadzenColumn Size="12" SizeMD="6" SizeLG="3">
+                    <RadzenFormField Text="Breed" Style="width: 100%;">
+                        <RadzenDropDown @bind-Value="animalResponse.BreedId" Data="@breeds" TextProperty="Name" ValueProperty="Id" Style="width:100%; display: block;" />
+                    </RadzenFormField>
+                </RadzenColumn>
+
+                <RadzenColumn Size="12" SizeMD="6" SizeLG="3">
+                    <RadzenFormField Text="Birth date" Style="width: 100%;">
+                        <RadzenDatePicker TValue="DateTime"   class="form-control" MaxLength="16" @bind-Value="@animalResponse.BirthDate" Style="width: 100%;" />
+                    </RadzenFormField>
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="6" SizeLG="3">
+                    <RadzenFormField Text="Sex" Style="width: 100%;">
+                        <RadzenDropDown @bind-Value="animalResponse.SexId" Data="@sexs" TextProperty="Name" ValueProperty="Id" Style="width:100%; display: block;" />
+                    </RadzenFormField>
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="6" SizeLG="3">
+                    <RadzenFormField Text="Price" Style="width: 100%;">
+                        <RadzenNumeric Format="0.00"  class="form-control" MaxLength="16" @bind-Value="@animalResponse.Price" Style="width: 100%;" />
+                    </RadzenFormField>
+                </RadzenColumn>
+                 <RadzenColumn Size="12" SizeMD="6" SizeLG="3">
+                    <RadzenFormField Text="Status " Style="width: 100%;">
+                        
+                        <RadzenDropDown @bind-Value="animalResponse.StatusRowId" Data="@statusrows" TextProperty="Name" ValueProperty="Id" Style="width:100%; display: block;" />
+                    </RadzenFormField>
+                </RadzenColumn>
+
+                
+                <RadzenButton Text="Filter" ButtonType="ButtonType.Button" Click="(() => FilterData())" ButtonStyle="ButtonStyle.Primary" />
+                <RadzenButton Text="All" ButtonType="ButtonType.Button" Click="(() => FilterData())" ButtonStyle="ButtonStyle.Primary" />
+                <RadzenButton Text="Clear" ButtonType="ButtonType.Button" Click="(() => FilterData())" ButtonStyle="ButtonStyle.Primary" />
+                
+                </RadzenRow>
+            </RadzenTemplateForm>
+            <RadzenButton Text="Datagrid Selected" ButtonType="ButtonType.Button" Click="(() => OtraFn())" ButtonStyle="ButtonStyle.Primary" />
+
+    </div>
+</div>
+
+
+
+
+
+
 @if (animals is null)
 {
     <p>Loading ... wait a moment!!!</p>
 }
 else
+
+
+
 {
     <div class="card">
         <div class="card-header">
             <span>
                 <i class="oi oi-globe"></i> Animals
-                <a class="btn btn-sm btn-primary float-end" href="/countries/create"><i class="oi oi-plus"></i> Adicionar País</a>
+                
             </span>
         </div>
         <div class="card-body">
@@ -27,8 +93,7 @@ else
                     <RadzenButton ButtonStyle="ButtonStyle.Success" Icon="add_circle_outline" class="mt-2 mb-4" Text="Add New Order" Click="@InsertRow" Disabled=@(animalToInsert != null || animalToUpdate != null) />
                     <RadzenDataGrid @ref="animalsGrid" AllowAlternatingRows="true" AllowPaging="true" PageSize="10" AllowSorting="true" EditMode="DataGridEditMode.Single"
                                 Data="@animals" TItem="AnimalResponse" RowUpdate="@OnUpdateRow" RowCreate="@OnCreateRow" Sort="@Reset" Page="@Reset" Filter="@Reset" ColumnWidth="180px"
-                                SelectionMode="DataGridSelectionMode.Multiple" @bind-Value=@selectedAnimalResponses class="m-4"
-                                Click="@MySelect">
+                                SelectionMode="DataGridSelectionMode.Multiple" @bind-Value=@selectedAnimalResponses class="m-4">
                         <Columns>
 
 
@@ -123,13 +188,22 @@ else
 }
 
 @code {
+    string value = "";
+
+    AnimalResponse animal;
+    AnimalResponse animalResponse = new AnimalResponse();
+
+    IList<AnimalResponse> selectedAnimalResponses = new List<AnimalResponse>();
+
+    List<AnimalResponse> selectedAnimalResponsesOtro;
 
     RadzenDataGrid<AnimalResponse>? animalsGrid;
     List<AnimalResponse> animals;
     IEnumerable<Sex> sexs;
     IEnumerable<StatusRow> statusrows;
     IEnumerable<Breed> breeds;
-    IList<AnimalResponse> selectedAnimalResponses;
+
+
     bool allowRowSelectOnRowClick = true;
 
     AnimalResponse animalToInsert;
@@ -140,6 +214,8 @@ else
         animalToInsert = null;
         animalToUpdate = null;
     }
+ 
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -151,10 +227,18 @@ else
         breeds = responseHttpbreeds.Response;
         await GetData();
     }
-
-    async Task GetData() { 
+    
+    async Task GetData()
+    {
         var responseHttp = await repository.Get<List<AnimalResponse>>("/Api/animals");
         animals = responseHttp.Response;
+    }
+
+    async Task FilterData()
+    { 
+       var responseHttpResponseFilter  = await repository.PostGetRows<AnimalResponse, List<AnimalResponse>>("/Api/animals/PostGetAll", animalResponse);
+       animals = responseHttpResponseFilter.Response;
+       
     }
 
     async Task EditRow(AnimalResponse animal)
@@ -244,12 +328,24 @@ else
 
     }
 
+    async Task OtraFn() { 
+
+        foreach (var item in selectedAnimalResponses)
+        {
+
+            Console.WriteLine(item.Name,"Otra Fn");
+        }
+    }
+
     async Task MySelect()
     {
 
         var a = selectedAnimalResponses;
-        foreach (var item in selectedAnimalResponses)
+        Console.WriteLine(a);
+        //selectedAnimalResponsesss.AddRange(selectedAnimalResponses);
+        foreach (var item in a)
         {
+            
             Console.WriteLine(item.Name);
         }
         

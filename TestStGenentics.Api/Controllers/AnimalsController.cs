@@ -31,7 +31,15 @@ namespace TestStGenentics.Api.Controllers
             return Ok(list);
         }
 
+        [HttpPost("PostGetAll")]
+        public async Task<ActionResult> PostGetAllAsync(AnimalResponse animalResponse)
+        {
 
+            var lista = await _animalDomain.GetAllAsyncByFilter(animalResponse);
+
+
+            return Ok(lista);
+        }
 
         [HttpPost]
         public async Task<ActionResult> PostAsync(AnimalResponse animalResponse)

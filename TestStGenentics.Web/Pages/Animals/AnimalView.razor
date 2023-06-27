@@ -141,6 +141,7 @@ else
                 <Body>
                     <RadzenButton ButtonStyle="ButtonStyle.Success" Icon="add_circle_outline" class="mt-2 mb-4" Text="Add New Order" Click="@InsertRow" Disabled=@(animalToInsert != null || animalToUpdate != null) />
                     <RadzenButton Text="Calculate purchase" ButtonType="ButtonType.Button" Click="(() => Calculate())" ButtonStyle="ButtonStyle.Primary" />
+                        <RadzenButton Text="Reset purchase" ButtonType="ButtonType.Button" Click="(() => ResetPurchase())" ButtonStyle="ButtonStyle.Primary" />
                     <RadzenDataGrid @ref="animalsGrid" AllowAlternatingRows="true" AllowPaging="true" PageSize="10" AllowSorting="true" EditMode="DataGridEditMode.Single"
                                 Data="@animals" TItem="AnimalResponse" RowUpdate="@OnUpdateRow" RowCreate="@OnCreateRow" Sort="@Reset" Page="@Reset" Filter="@Reset" ColumnWidth="180px"
                                 SelectionMode="DataGridSelectionMode.Multiple" @bind-Value=@selectedAnimalResponses class="m-4">
@@ -273,6 +274,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
+        dataselected = false;
         var responseHttpsexs = await repository.Get<List<Sex>>("/Api/sexs");
         sexs = responseHttpsexs.Response;
         var responseHttpstatusrows = await repository.Get<List<StatusRow>>("/Api/statusrows");
@@ -285,7 +287,8 @@ else
 
     async Task GetData()
     {
-        bool dataselected = false;
+       
+        //selectedAnimalResponses = null;
         var responseHttp = await repository.Get<List<AnimalResponse>>("/Api/animals");
         animals = responseHttp.Response;
     }
@@ -298,9 +301,18 @@ else
     }
 
     async Task ClearFilter()
-    { 
+    {
+        
         await GetData();
 
+    }
+
+    async Task ResetPurchase()
+    {
+
+        await GetData();
+        selectedAnimalResponses = null;
+        dataselected = false;
     }
     async Task EditRow(AnimalResponse animal)
     {
